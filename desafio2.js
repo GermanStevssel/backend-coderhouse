@@ -1,52 +1,71 @@
 const fs = require("fs");
 
 class Contenedor {
-	constructor(file) {
-		this.file = file;
-		this.object = [];
+	constructor(fileName) {
+		this.fileName = fileName;
+		this.products = [];
 	}
-
 	getAll() {
-		const fileContent = JSON.parse(fs.readFileSync(this.file, "utf8"));
-		this.object = fileContent;
-		return this.object;
+		const fileContent = JSON.parse(fs.readFileSync(this.fileName, "utf8"));
+		this.products = fileContent;
+		return this.products;
 	}
 	getById(id) {
 		const products = this.getAll();
-		const filteredArray = products.filter((product) => product.id === id);
-		if (filteredArray[0]) {
-			return filteredArray[0];
+		const productFinded = products.find((product) => product.id === id);
+
+		if (productFinded) {
+			console.log(productFinded);
+			return productFinded;
 		} else {
+			console.log("El producto no existe");
 			return null;
 		}
 	}
+
 	deleteById(id) {
 		const products = this.getAll();
-		const filteredArray = products.filter((product) => product.id !== id);
-		fs.writeFileSync("./products.txt", JSON.stringify(filteredArray));
+		const idExist = products.some((product) => product.id === id);
+
+		if (!idExist) {
+			console.log(`El producto con id ${id} no existe`);
+			return;
+		}
+
+		const newProducts = products.filter((product) => product.id !== id);
+		const textNewProducts = JSON.stringify(newProducts);
+		fs.writeFileSync(this.fileName, textNewProducts);
 	}
+
 	deleteAll() {
-		fs.writeFileSync("./products.txt", JSON.stringify([]));
+		const emptyFile = JSON.stringify([]);
+		try {
+			fs.writeFileSync(this.fileName, emptyFile);
+			console.log("Todos los productos han sido borrados");
+		} catch (err) {
+			console.error(err);
+		}
 	}
-	save(obj) {
+	save(product) {
+		let id;
 		const products = this.getAll();
-		console.log(products);
 		if (products.length === 0) {
-			const newObj = { ...obj, id: 1 };
-			products.push(newObj);
-			fs.writeFileSync("./products.txt", JSON.stringify(products));
+			id = 1;
+			const productWithId = { ...product, id: id };
+			products.push(productWithId);
+			const txtProduct = JSON.stringify(products);
+			fs.writeFileSync(this.fileName, txtProduct);
 		} else {
-			const indexOfLastElement = products.length - 1;
-			const newObj = { ...obj, id: products[indexOfLastElement].id + 1 };
-			products.push(newObj);
-			fs.writeFileSync("./products.txt", JSON.stringify(products));
+			id = products[products.length - 1].id + 1;
+			const productWithId = { ...product, id: id };
+			products.push(productWithId);
+			const txtProduct = JSON.stringify(products);
+			fs.writeFileSync(this.fileName, txtProduct);
 		}
 	}
 }
 
 const container = new Contenedor("./products.txt");
-
-console.log(container.getAll());
 
 container.save({
 	title: "Uncharted 4",
@@ -55,13 +74,13 @@ container.save({
 		"http://d3ugyf2ht6aenh.cloudfront.net/stores/001/159/532/products/uncharted-41-7c6539daee1256fa0715881138324461-640-0.jpg",
 });
 container.save({
-	title: "Hollow Knight",
-	price: 8075,
+	title: "Hollow Kinght",
+	price: 8065,
 	thumbnail:
 		"https://savegame.pro/wp-content/uploads/2020/02/hollow-knight-cover.jpg",
 });
 
-container.getById(9);
-container.getById(2);
-container.deleteById(1);
-container.getAll();
+console.log(container.getAll());
+container.getById(1);
+container.deleteById(2);
+// container.deleteAll();
