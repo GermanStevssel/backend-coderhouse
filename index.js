@@ -113,7 +113,7 @@ app.get("/productos", (req, res) => {
 
 // Obtener un producto random
 app.get("/producto-random", (req, res) => {
-	const maxProducts = container.getAll().length;
+	const maxProducts = container.getAll().length + 1;
 	const productId = Math.floor(Math.random() * (maxProducts - 1)) + 1;
 	const product = container.getById(productId);
 	res.send(`<div>
