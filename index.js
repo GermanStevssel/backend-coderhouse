@@ -105,6 +105,12 @@ const server = app.listen(PORT, () => {
  */
 server.on("error", (error) => console.log(`Error en servidor ${error}`));
 
+app.all("/", function (request, response) {
+	response.send(
+		"<h1>Desafío 3</h1><h2><a href='./productos'>Productos</h2><h2><a href='./producto-random'>Producto random</h2>"
+	);
+});
+
 // Para obtener info del server, utilizamos la petición GET
 // Obtener todos los productos en un array
 app.get("/productos", (req, res) => {
