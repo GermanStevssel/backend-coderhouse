@@ -51,6 +51,27 @@ class Contenedor {
 			console.error(err);
 		}
 	}
+
+	updateById(id, newProduct) {
+		const products = this.getAll();
+		const productIndex = products.findIndex((product) => product.id === id);
+		const idExist = products.some((product) => product.id === id);
+
+		if (!idExist) {
+			console.log(
+				`El producto con id ${id} no existe, se guardara con un nuevo id`
+			);
+			this.save(newProduct);
+		}
+		if (productIndex > -1) {
+			let id = products[productIndex].id;
+			newProduct = { ...newProduct, id: id };
+			products[productIndex] = newProduct;
+			const textProducts = JSON.stringify(products);
+			fs.writeFileSync("./products.txt", textProducts);
+		}
+	}
+
 	save(product) {
 		let id;
 		const products = this.getAll();
@@ -135,12 +156,10 @@ server.on("error", (error) => console.log(`Error en servidor ${error}`));
 
 // Desafío 4
 
-app.use("/api", router);
+app.use("/api", router); // las rutas de router inician con /api/....
 
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
-
-app.use(express.static("public"));
 
 router.get("/productos", (req, res) => {
 	res.send(container.getAll());
@@ -150,9 +169,9 @@ router.get("/producto/:productId", (req, res) => {
 	const productId = parseInt(req.params.productId);
 	const product = container.getById(productId);
 	res.send(`<div>
-		<h1>${product.title}</h1>
-		<h2>$ ${product.price}</h2>
-		<img src="${product.thumbnail}" alt="Imagen de videjouego" />
+	<h1>${product.title}</h1>
+	<h2>$ ${product.price}</h2>
+	<img src="${product.thumbnail}" alt="Imagen de videjouego" />
 	</div>`);
 });
 
@@ -162,15 +181,17 @@ router.post("/productos", (req, res) => {
 });
 
 router.put("/productos/:id", (req, res) => {
-	const idProvided = Number(req.params.id);
-	container.updateById(idProvided, {
+	const productId = parseInt(req.params.productId);
+	container.updateById(productId, {
 		...req.body,
-		id: idProvided,
+		id: productId,
 	});
 	res.send(container.getById(idProvided));
 });
 
 router.delete("/productos/:id", (req, res) => {
-	const idProvided = Number(req.params.id);
-	res.send(container.deleteById(idProvided));
+	const productId = parseInt(req.params.productId);
+	res.send(container.deleteById(productId));
 });
+
+app.use(express.static("public"));
