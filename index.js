@@ -62,6 +62,7 @@ class Contenedor {
 				`El producto con id ${id} no existe, se guardara con un nuevo id`
 			);
 			this.save(newProduct);
+			return;
 		}
 		if (productIndex > -1) {
 			let id = products[productIndex].id;
