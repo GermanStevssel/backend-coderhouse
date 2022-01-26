@@ -65,8 +65,7 @@ class Contenedor {
 		}
 		if (productIndex > -1) {
 			let id = products[productIndex].id;
-			newProduct = { ...newProduct, id: id };
-			products[productIndex] = newProduct;
+			products[productIndex] = { ...newProduct, id: id };
 			const textProducts = JSON.stringify(products);
 			fs.writeFileSync("./products.txt", textProducts);
 		}
