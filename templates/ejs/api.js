@@ -7,25 +7,33 @@ const router = Router();
 const PORT = 8080;
 
 app.use("/api", router); // las rutas de router inician con /api/....
-app.listen(PORT);
+const server = app.listen(PORT, () => {
+	console.log(`Express is listening in port http://localhost:${PORT}`);
+});
+
+server.on("error", (error) => console.log(`Error en servidor ${error}`));
 
 router.use(express.json());
-router.use(express.urlencoded({ extended: true })); //extended, inflate, limit, type, verify, parameterLimit
-/*función de middleware incorporada en Express. Analiza las requests entrantes con cargas 
-útiles codificadas en urlencoded y se basa en body-parser. Devuelve un objeto*/
+router.use(express.urlencoded({ extended: true }));
 
-/*Se manipulan archivos estaticos con un middleware: app.use(prefijo virtual de url, express.static(path))
-el prefijo virtual se es una ruta virtual, ya que el path real no existe en el fs.
-en el parametro "path", se coloca la ruta donde tenemos guardados todos los archivos estáticos como css,
-html, js, jpg, etc*/
-app.use(express.static("public"));
+app.set("view engine", "ejs"); // registra el motor de plantillas
+app.set("views", "./views"); // especifica el directorio de vistas
+
+const videogames = [];
 
 // Endpoints
+app.get("/", (req, res) => {
+	res.render("index", { videogames });
+});
+app.get("/bitacora", (req, res) => {
+	res.render("bitacora", { videogames });
+});
+
 router.get("/productos", (req, res) => {
 	res.send(container.getAll());
 });
 
-router.get("/producto/:productId", (req, res) => {
+router.get("/productos/:productId", (req, res) => {
 	const productId = parseInt(req.params.productId);
 	const product = container.getById(productId);
 	res.send(`<div>
@@ -37,7 +45,8 @@ router.get("/producto/:productId", (req, res) => {
 
 router.post("/productos", (req, res) => {
 	container.save(req.body);
-	res.json(req.body);
+	videogames.push(req.body);
+	res.redirect("/");
 });
 
 router.put("/productos/:productId", (req, res) => {

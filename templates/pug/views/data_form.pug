@@ -1,0 +1,14 @@
+extends layout 
+
+block form
+
+	h2="Ingrese los datos del nuevo juego"
+	form(action="/api/productos" method="POST")
+		label(for="title")=title
+		input(type="text" name="title")
+		label(for="price")=price
+		input(type="text" name="price")
+		label(for="title")=thumbnail
+		input(type="text" name="thumbnail")
+		button(type="submit")="Cargar"
+	a(href="./api/productos")="Ver productos"

@@ -1,0 +1,26 @@
+<% if(videogames.length> 0){ %>
+  <div class="table-responsive">
+    <table class="table table-success table-striped">
+      <tr>
+        <th>Título</th>
+        <th>Precio</th>
+        <th class="text-center">Thumbnail</th>
+      </tr>
+      <%videogames.forEach((videogame)=> {%>
+        <tr>
+          <td>
+            <%=videogame.title%>
+          </td>
+          <td>
+            $<%=videogame.price%>
+          </td>
+          <td class="d-flex justify-content-center">
+            <img src="<%=videogame.thumbnail%>" width="60px" height="60px" />
+          </td>
+        </tr>
+        <%});%>
+    </table>
+  </div>
+  <% } else{ %>
+    <h3 class="alert alert-danger">No se encontraron productos</h1>
+      <% } %>
