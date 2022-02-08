@@ -1,31 +1,66 @@
-const Contenedor = require("./container.js");
+import fs from "fs";
+import Contenedor from "./templates/ejs/container.js";
 const container = new Contenedor("./products.txt");
-const express = require("express");
+import express, { json, urlencoded } from "express";
+import { Server as HttpServer } from "http";
+import { Server as IOServer } from "socket.io";
 const app = express();
+const httpServer = new HttpServer(app); //le paso mis datos de app para levantar la aplicación
+const io = new IOServer(httpServer); //establezco mi puente de datos en RT con el servidor http
 const { Router } = express;
 const router = Router();
 const PORT = 8080;
 
-app.use("/api", router); // las rutas de router inician con /api/....
-app.listen(PORT);
+app.use("/center", router); // las rutas de router inician con /center/....
+const server = httpServer.listen(PORT, () => {
+	console.log(`Express is listening in port http://localhost:${PORT}`);
+});
 
-router.use(express.json());
-router.use(express.urlencoded({ extended: true })); //extended, inflate, limit, type, verify, parameterLimit
-/*función de middleware incorporada en Express. Analiza las requests entrantes con cargas 
-útiles codificadas en urlencoded y se basa en body-parser. Devuelve un objeto*/
-
-/*Se manipulan archivos estaticos con un middleware: app.use(prefijo virtual de url, express.static(path))
-el prefijo virtual se es una ruta virtual, ya que el path real no existe en el fs.
-en el parametro "path", se coloca la ruta donde tenemos guardados todos los archivos estáticos como css,
-html, js, jpg, etc*/
 app.use(express.static("public"));
 
+server.on("error", (error) => console.log(`Error en servidor ${error}`));
+
+router.use(json());
+router.use(urlencoded({ extended: true }));
+
+app.set("view engine", "ejs"); // registra el motor de plantillas
+app.set("views", "./public/views"); // especifica el directorio de vistas
+
+const messages = [];
+const videogames = [];
+
+io.on("connection", (socket) => {
+	//connection se ejecuta la primera vez que se abre una nueva conexión
+	//se imprimira solo la primera vez que se abra la conexión
+	console.log("Nuevo cliente conectado");
+	//Envío los mensajes existentes a todos los nuevos clientes
+	socket.emit("ServerMsgs", messages);
+	// socket.emit(, videogames)
+	/*Escucho los mensajes enviados por el cliente con nombre "clientMsg" y lo broadcasteo 
+  a todos los conectados al server con el evento llamado "ServerMsgs"*/
+	socket.on("clientMsg", (data) => {
+		// console.log("mensaje del cliente recibido - Se retransmitira");
+		messages.push({
+			date: data.date,
+			clientEmail: data.clientEmail,
+			message: data.message,
+		});
+		io.sockets.emit("ServerMsgs", messages);
+		const stringMessages = JSON.stringify(messages);
+		fs.writeFileSync("./assets/messages.txt", stringMessages);
+	});
+});
+
 // Endpoints
+app.get("/", (req, res) => {
+	res.render("index", { videogames });
+});
+
 router.get("/productos", (req, res) => {
 	res.send(container.getAll());
 });
 
-router.get("/producto/:productId", (req, res) => {
+router.get("/productos/:productId", (req, res) => {
 	const productId = parseInt(req.params.productId);
 	const product = container.getById(productId);
 	res.send(`<div>
@@ -37,7 +72,8 @@ router.get("/producto/:productId", (req, res) => {
 
 router.post("/productos", (req, res) => {
 	container.save(req.body);
-	res.json(req.body);
+	videogames.push(req.body);
+	res.redirect("/");
 });
 
 router.put("/productos/:productId", (req, res) => {

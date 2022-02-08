@@ -1,6 +1,7 @@
-const Contenedor = require("./container.js");
+const fs = require("fs");
+import Contenedor from "./templates/ejs/container.js";
 const container = new Contenedor("./products.txt");
-const express = require("express");
+import express, { json, urlencoded } from "express";
 const app = express();
 const { Router } = express;
 const router = Router();
@@ -13,8 +14,8 @@ const server = app.listen(PORT, () => {
 
 server.on("error", (error) => console.log(`Error en servidor ${error}`));
 
-router.use(express.json());
-router.use(express.urlencoded({ extended: true }));
+router.use(json());
+router.use(urlencoded({ extended: true }));
 
 app.set("view engine", "ejs"); // registra el motor de plantillas
 app.set("views", "./views"); // especifica el directorio de vistas
@@ -23,7 +24,7 @@ const videogames = [];
 
 // Endpoints
 app.get("/", (req, res) => {
-	res.render("index", { videogames });
+	res.render("index");
 });
 app.get("/bitacora", (req, res) => {
 	res.render("bitacora", { videogames });
