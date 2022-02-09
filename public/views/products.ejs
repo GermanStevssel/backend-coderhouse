@@ -6,8 +6,8 @@
         <th>Precio</th>
         <th class="text-center">Thumbnail</th>
       </tr>
-      <%videogames.forEach((videogame)=> {%>
-        <tr>
+      <tr id="videogames">
+        <%videogames.forEach((videogame)=> {%>
           <td>
             <%=videogame.title%>
           </td>
@@ -17,8 +17,8 @@
           <td class="d-flex justify-content-center">
             <img src="<%=videogame.thumbnail%>" width="60px" height="60px" />
           </td>
-        </tr>
-        <%});%>
+      </tr>
+      <%});%>
     </table>
   </div>
   <% } else{ %>
