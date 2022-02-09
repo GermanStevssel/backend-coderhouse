@@ -42,3 +42,36 @@ const writeMsgs = (msgs) => {
 socket.on("ServerMsgs", (msgs) => {
 	writeMsgs(msgs);
 });
+
+const title = document.querySelector("#title");
+const price = document.querySelector("#price");
+const thumbnail = document.querySelector("#thumbnail");
+
+const addProduct = (evt) => {
+	let videogame = {
+		title: title.value,
+		price: price.value,
+		thumbnail: thumbnail.value,
+	};
+
+	socket.emit("newVideogame", videogame);
+	title.value = "";
+	price.value = "";
+	thumbnail.value = "";
+};
+
+const renderTable = (data) => {
+	const videogamesHTML = data.map((elem) => {
+		return `<td>${elem.title}</td>
+				<td>${elem.price}</td>
+				<td class="d-flex justify-content-center">
+					<img src=${elem.thumbnail} width="60px" height="60px" />
+				</td>`;
+	});
+
+	document.querySelector("#videogames").innerHTML = videogamesHTML;
+};
+
+socket.on("videogames", (videogames) => {
+	renderTable(videogames);
+});

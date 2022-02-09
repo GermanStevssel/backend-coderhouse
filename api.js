@@ -35,7 +35,27 @@ io.on("connection", (socket) => {
 	console.log("Nuevo cliente conectado");
 	//Envío los mensajes existentes a todos los nuevos clientes
 	socket.emit("ServerMsgs", messages);
-	// socket.emit(, videogames)
+
+	socket.emit("videogames", videogames);
+
+	socket.on("newVideogame", (data) => {
+		let newID = videogames.length + 1;
+
+		let newTitle = data.title;
+		let newPrice = data.price;
+		let newThumbnail = data.thumbnail;
+
+		const videogame = {
+			id: newID,
+			title: newTitle,
+			price: newPrice,
+			thumbnail: newThumbnail,
+		};
+
+		videogames.push(videogame);
+
+		io.sockets.emit("videogames", videogames);
+	});
 	/*Escucho los mensajes enviados por el cliente con nombre "clientMsg" y lo broadcasteo 
   a todos los conectados al server con el evento llamado "ServerMsgs"*/
 	socket.on("clientMsg", (data) => {

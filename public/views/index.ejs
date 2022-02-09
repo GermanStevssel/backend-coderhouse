@@ -17,7 +17,28 @@
   </div>
   <main class="container">
     <h2 class="h2 mt-4 mb-3 text-center">Bitácora</h2>
-    <%- include('./products')-%>
+    <div class="table-responsive" id="videogames">
+      <table class="table table-success table-striped">
+        <tr>
+          <th>Título</th>
+          <th>Precio</th>
+          <th class="text-center">Thumbnail</th>
+        </tr>
+        <%videogames.forEach((videogame)=> {%>
+          <tr id="videogames">
+            <td>
+              <%=videogame.title%>
+            </td>
+            <td>
+              $<%=videogame.price%>
+            </td>
+            <td class="d-flex justify-content-center">
+              <img src="<%=videogame.thumbnail%>" width="60px" height="60px" />
+            </td>
+          </tr>
+          <%});%>
+      </table>
+    </div>
   </main>
   <div>
     <%- include('./chat')-%>

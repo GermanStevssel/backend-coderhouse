@@ -1,5 +1,5 @@
 <h2 class="my-4 h2">Ingresar juego a su colección</h2>
-<form action="/center/productos" method="POST" class="d-flex flex-column">
+<form enctype="application/x-www-form-urlencoded" class="d-flex flex-column" onsubmit="return addProduct(this)">
 	<div class="form-floating mb-3">
 		<input class="form-control" type="text" name="title" id="title" />
 		<label for="title">

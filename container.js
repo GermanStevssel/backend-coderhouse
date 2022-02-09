@@ -1,6 +1,6 @@
-const fs = require("fs");
+import fs from "fs";
 
-module.exports = class Contenedor {
+export default class Contenedor {
 	constructor(fileName) {
 		this.fileName = fileName;
 		this.products = [];
@@ -84,4 +84,4 @@ module.exports = class Contenedor {
 			fs.writeFileSync(this.fileName, txtProduct);
 		}
 	}
-};
+}
