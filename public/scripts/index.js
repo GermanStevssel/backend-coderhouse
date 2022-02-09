@@ -61,17 +61,23 @@ const addProduct = (evt) => {
 };
 
 const renderTable = (data) => {
-	const videogamesHTML = data.map((elem) => {
-		return `<td>${elem.title}</td>
+	const videogamesHTML = data
+		.map((elem) => {
+			return `<tr>
+				<td>${elem.title}</td>
 				<td>${elem.price}</td>
 				<td class="d-flex justify-content-center">
 					<img src=${elem.thumbnail} width="60px" height="60px" />
-				</td>`;
-	});
-
+				</td>
+				</tr>`;
+		})
+		.join(" ");
+	console.log(videogamesHTML);
+	document.querySelector("#videogames").value = "";
 	document.querySelector("#videogames").innerHTML = videogamesHTML;
 };
 
 socket.on("videogames", (videogames) => {
+	console.log(videogames);
 	renderTable(videogames);
 });
