@@ -19,7 +19,7 @@ cartRouter.use(urlencoded({ extended: true }));
 
 let videogames = [];
 
-let admin = false;
+let admin = true;
 
 const authError = (req) => ({
 	error: -1,
