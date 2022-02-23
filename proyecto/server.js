@@ -4,7 +4,6 @@ import express, { json, urlencoded } from "express";
 const container = new Contenedor("./products.txt");
 const app = express();
 const { Router } = express;
-const router = Router();
 const videogamesRouter = Router();
 const cartRouter = Router();
 const PORT = 8080 || process.env.PORT;
@@ -20,7 +19,7 @@ cartRouter.use(urlencoded({ extended: true }));
 
 let videogames = [];
 
-let admin = true;
+let admin = false;
 
 const authError = (req) => ({
 	error: -1,
@@ -52,7 +51,7 @@ videogamesRouter.post("/", (req, res) => {
 		videogames.push(req.body);
 		res.json(videogames);
 	} else {
-		res.send(authError);
+		res.send(authError(req));
 	}
 });
 
@@ -65,7 +64,7 @@ videogamesRouter.put("/:videogameId", (req, res) => {
 		});
 		res.send(container.getById(videogameId));
 	} else {
-		res.send(authError);
+		res.send(authError(req));
 	}
 });
 
@@ -79,7 +78,7 @@ videogamesRouter.delete("/", (req, res) => {
 		container.deleteAll();
 		res.send({ result: "Todos los videojuegos han sido eliminados" });
 	} else {
-		res.send(authError);
+		res.send(authError(req));
 	}
 });
 
