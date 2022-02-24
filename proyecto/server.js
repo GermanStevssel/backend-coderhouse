@@ -90,7 +90,7 @@ const videogamesCollection = [];
 
 const date = new Date();
 
-const userError = { error: -2, description: "Usuario no encontrado" };
+const cartError = { error: -2, description: "Carrito no encontrado" };
 
 cartRouter.get("/:cartId/videogames", (req, res) => {
 	const cartId = parseInt(req.params.cartId);
@@ -107,7 +107,7 @@ cartRouter.get("/:cartId/videogames", (req, res) => {
 			? res.send(userCart[0].videogames)
 			: { products: "No hay productos en este carrito" };
 	} else {
-		res.send(userError);
+		res.send(cartError);
 	}
 });
 
@@ -151,7 +151,7 @@ cartRouter.post("/:cartId/videogames", (req, res) => {
 		carts[indexOfCart].videogames = videogamesCollection;
 		res.send({ response: "Videojuego agregado al carrito" });
 	} else {
-		res.send(userError);
+		res.send(cartError);
 	}
 	const textCarts = JSON.stringify(carts);
 	fs.writeFileSync("./carts.txt", textCarts);
@@ -165,7 +165,7 @@ cartRouter.delete("/:cartId", (req, res) => {
 		carts.splice(indexOfCart, 1);
 		res.send({ result: `Carrito eliminado: ${cartId}` });
 	} else {
-		res.send(userError);
+		res.send(cartError);
 	}
 
 	const textCarts = JSON.stringify(carts);
@@ -187,10 +187,10 @@ cartRouter.delete("/:cartId/videogames/:videogameId", (req, res) => {
 			videogamesInCart.splice(videogameIndex, 1);
 			res.send(carts);
 		} else {
-			res.send(userError);
+			res.send(cartError);
 		}
 	} else {
-		res.send(userError);
+		res.send(cartError);
 	}
 	const textCarts = JSON.stringify(carts);
 	fs.writeFileSync("./carts.txt", textCarts);
