@@ -1,9 +1,10 @@
 import fs from "fs";
-import Contenedor from "./templates/ejs/container.js";
+import { mariaDBKnex } from "./db/database";
+import { Container } from "./containerKnex";
 import express, { json, urlencoded } from "express";
 import { Server as HttpServer } from "http";
 import { Server as IOServer } from "socket.io";
-const container = new Contenedor("./products.txt");
+const container = new Container("./products.txt");
 const app = express();
 const httpServer = new HttpServer(app); //le paso mis datos de app para levantar la aplicación
 const io = new IOServer(httpServer); //establezco mi puente de datos en RT con el servidor http
@@ -28,6 +29,15 @@ app.set("views", "./public/views"); // especifica el directorio de vistas
 
 const messages = [];
 let videogames = [];
+
+const saveMessages = (message) => {
+	mariaDBKnex("messages")
+		.insert(message)
+		.then(() => console.log("Mensaje guardado en la base de datos"))
+		.catch((err) => {
+			throw err;
+		});
+};
 
 io.on("connection", (socket) => {
 	//connection se ejecuta la primera vez que se abre una nueva conexión
@@ -59,9 +69,8 @@ io.on("connection", (socket) => {
 			clientEmail: data.clientEmail,
 			message: data.message,
 		});
+		saveMessages(data);
 		io.sockets.emit("ServerMsgs", messages);
-		const stringMessages = JSON.stringify(messages);
-		fs.writeFileSync("./assets/messages.txt", stringMessages);
 	});
 });
 
@@ -223,7 +232,7 @@ cartRouter.delete("/:userId/videogames/:videogameId", (req, res) => {
 });
 
 const server = httpServer.listen(PORT, () => {
-	console.log(`Express is listening in port http://localhost:${PORT}`);
+	console.log(`HTTP server is listening in port http://localhost:${PORT}`);
 });
 
 server.on("error", (error) => console.log(`Error en servidor ${error}`));

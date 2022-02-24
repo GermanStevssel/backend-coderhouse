@@ -17,6 +17,9 @@
 	"dependencies": {
 		"ejs": "^3.1.6",
 		"express": "^4.17.2",
-		"socket.io": "^4.4.1"
+		"knex": "^1.0.3",
+		"mysql": "^2.18.1",
+		"socket.io": "^4.4.1",
+		"sqlite3": "^5.0.2"
 	}
 }
