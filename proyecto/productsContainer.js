@@ -1,6 +1,6 @@
 import fs from "fs";
 
-export default class Contenedor {
+export default class ProductsContainer {
 	constructor(fileName) {
 		this.fileName = fileName;
 		this.products = [];
