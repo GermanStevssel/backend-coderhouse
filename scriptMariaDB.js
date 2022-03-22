@@ -13,9 +13,9 @@ mariaDBKnex.schema
 	.then(() => console.log("Tabla creada"))
 	.catch((err) => console.err(err));
 
-mariaDBKnex.schema
-	.dropTable("products")
-	.then(() => console.log("Tabla products ha sido eliminada"));
+// mariaDBKnex.schema
+// 	.dropTable("products")
+// 	.then(() => console.log("Tabla products ha sido eliminada"));
 
 const producto = {
 	name: "articulo1",
@@ -27,15 +27,15 @@ const producto = {
 	stock: 100,
 };
 
-const producto = {
-	name: "articulo2",
-	productTimestamp: "fyh2",
-	description: "Descripción2",
-	code: "Código2",
-	url: "link2",
-	price: 10,
-	stock: 80,
-};
+// const producto = {
+// 	name: "articulo2",
+// 	productTimestamp: "fyh2",
+// 	description: "Descripción2",
+// 	code: "Código2",
+// 	url: "link2",
+// 	price: 10,
+// 	stock: 80,
+// };
 
 mariaDBKnex("productos")
 	.insert(producto)
@@ -66,7 +66,7 @@ mariaDBKnex
 
 mariaDBKnex
 	.from("productos")
-	.where("id", "=", 3)
+	.where("id", 3)
 	.del()
 	.then(() => console.log("Producto eliminado"))
 	.catch((err) => {
@@ -77,9 +77,8 @@ mariaDBKnex
 		mariaDBKnex.destroy();
 	});
 
-mariaDBKnex
-	.from("articulos")
-	.where("id", "=", 5)
+mariaDBKnex("articulos")
+	.where("id", 5)
 	.update({ stock: 0 })
 	.then(() => console.log("Stock actualizado"))
 	.catch((err) => {

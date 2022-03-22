@@ -1,6 +1,6 @@
-const Contenedor = require("./container.js");
+import Container from "./containers/containerFS.js";
 
-const container = new Contenedor("./products.txt");
+const container = new Container("./products.txt");
 
 container.save({
 	title: "Uncharted 4",

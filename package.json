@@ -2,10 +2,10 @@
 	"name": "coderhouse-backend",
 	"version": "1.0.0",
 	"description": "",
-	"main": "api.js",
+	"main": "server.js",
 	"type": "module",
 	"scripts": {
-		"start": "nodemon api.js",
+		"start": "nodemon server.js",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"keywords": [],
@@ -15,10 +15,15 @@
 		"@types/node": "^17.0.8"
 	},
 	"dependencies": {
+		"dotenv": "^16.0.0",
 		"ejs": "^3.1.6",
 		"express": "^4.17.2",
-		"knex": "^1.0.3",
+		"faker": "^6.6.6",
+		"knex": "^0.95.15",
+		"mongodb": "^4.4.1",
+		"mongoose": "^6.2.7",
 		"mysql": "^2.18.1",
+		"normalizr": "^3.6.2",
 		"socket.io": "^4.4.1",
 		"sqlite3": "^5.0.2"
 	}

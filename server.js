@@ -1,9 +1,11 @@
+import "dotenv/config";
 import fs from "fs";
 import { mariaDBKnex } from "./db/database";
-import { Container } from "./containerKnex";
+import { Container } from "./containers/containerKnex.js";
 import express, { json, urlencoded } from "express";
 import { Server as HttpServer } from "http";
 import { Server as IOServer } from "socket.io";
+import { fakeProductsRouter } from "./routers/productsFaker";
 const container = new Container("./products.txt");
 const app = express();
 const httpServer = new HttpServer(app); //le paso mis datos de app para levantar la aplicación
@@ -14,15 +16,15 @@ const videogamesRouter = Router();
 const cartRouter = Router();
 const PORT = 8080 || process.env.PORT;
 
-app.use("/center", router); // las rutas de router inician con /center/....
-app.use("/center/productos", videogamesRouter);
-app.use("/center/cart", cartRouter);
+app.use(json());
+app.use(urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-videogamesRouter.use(json());
-videogamesRouter.use(urlencoded({ extended: true }));
-cartRouter.use(json());
-cartRouter.use(urlencoded({ extended: true }));
+app.use("/api", router); // las rutas de router inician con /api/....
+app.use("/api/productos", videogamesRouter);
+app.use("/api/cart", cartRouter);
+app.use("/api/productos-test", fakeProductsRouter);
+app.use(express.static("public"));
 
 app.set("view engine", "ejs"); // registra el motor de plantillas
 app.set("views", "./public/views"); // especifica el directorio de vistas
