@@ -19,6 +19,9 @@ export class Container {
 			.catch((err) => {
 				console.err(err);
 				throw err;
+			})
+			.finally(() => {
+				knex.destroy();
 			});
 
 		return this.query;
@@ -48,7 +51,7 @@ export class Container {
 			.from(this.table)
 			.where("id", "=", id)
 			.del()
-			.then(() => console.log(`Producto con id: ${id}`))
+			.then(() => console.log(`Producto con id ${id} eliminado`))
 			.catch((err) => {
 				console.log(err);
 				throw err;

@@ -1,9 +1,12 @@
+import "dotenv/config";
 import fs from "fs";
+import mongoose from "mongoose";
 import { mariaDBKnex } from "./db/database";
-import { Container } from "./containerKnex";
+import { Container } from "./containers/containerKnex.js";
 import express, { json, urlencoded } from "express";
 import { Server as HttpServer } from "http";
 import { Server as IOServer } from "socket.io";
+import { fakeProductsRouter } from "./routers/productsFaker";
 const container = new Container("./products.txt");
 const app = express();
 const httpServer = new HttpServer(app); //le paso mis datos de app para levantar la aplicación
@@ -14,29 +17,60 @@ const videogamesRouter = Router();
 const cartRouter = Router();
 const PORT = 8080 || process.env.PORT;
 
-app.use("/center", router); // las rutas de router inician con /center/....
-app.use("/center/productos", videogamesRouter);
-app.use("/center/cart", cartRouter);
+// ---------- Mongo -----------
+mongoose
+	.connect(
+		"mongodb+srv://mongoCoder:mongoCoder@stevssel-backend.qp3xl.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+	)
+	.then(() => console.log("Base de datos MongoDB conectada"))
+	.catch((err) => console.log(err));
+
+import MongoContainer from "./containers/containerMongo.js";
+
+import messagesSchema from "./models/messages";
+const containerMongoMessages = new MongoContainer("messages", messagesSchema);
+
+// ---------- Mongo -----------
+
+app.use(json());
+app.use(urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-videogamesRouter.use(json());
-videogamesRouter.use(urlencoded({ extended: true }));
-cartRouter.use(json());
-cartRouter.use(urlencoded({ extended: true }));
+app.use("/api", router); // las rutas de router inician con /api/....
+app.use("/api/productos", videogamesRouter);
+app.use("/api/cart", cartRouter);
+app.use("/api/productos-test", fakeProductsRouter);
+app.use(express.static("public"));
 
 app.set("view engine", "ejs"); // registra el motor de plantillas
 app.set("views", "./public/views"); // especifica el directorio de vistas
 
-const messages = [];
 let videogames = [];
 
 const saveMessages = (message) => {
-	mariaDBKnex("messages")
-		.insert(message)
-		.then(() => console.log("Mensaje guardado en la base de datos"))
-		.catch((err) => {
-			throw err;
-		});
+	containerMongoMessages.save(message);
+};
+
+import { normalize, denormalize, schema } from "normalizr";
+
+import util from "util";
+
+// Defino un esquema para cada mensaje
+
+const messageSchema = new schema.Entity("message");
+
+// Defino un esquema para cada autor //
+
+const authorSchema = new schema.Entity(
+	"author",
+	{
+		autor: messageSchema,
+	},
+	{ idAttribute: "email" }
+);
+
+const print = (obj) => {
+	console.log(util.inspect(obj, false, 12, true));
 };
 
 io.on("connection", (socket) => {
@@ -44,7 +78,7 @@ io.on("connection", (socket) => {
 	//se imprimira solo la primera vez que se abra la conexión
 	console.log("Nuevo cliente conectado");
 	//Envío los mensajes existentes a todos los nuevos clientes
-	socket.emit("ServerMsgs", messages);
+	socket.emit("ServerMsgs", containerMongoMessages.getAll());
 	socket.emit("videogames", videogames);
 	socket.on("newVideogame", (data) => {
 		let newID = videogames.length + 1;
@@ -64,13 +98,8 @@ io.on("connection", (socket) => {
   a todos los conectados al server con el evento llamado "ServerMsgs"*/
 	socket.on("clientMsg", (data) => {
 		// console.log("mensaje del cliente recibido - Se retransmitira");
-		messages.push({
-			date: data.date,
-			clientEmail: data.clientEmail,
-			message: data.message,
-		});
 		saveMessages(data);
-		io.sockets.emit("ServerMsgs", messages);
+		io.sockets.emit("ServerMsgs", containerMongoMessages.getAll());
 	});
 });
 
@@ -229,6 +258,38 @@ cartRouter.delete("/:userId/videogames/:videogameId", (req, res) => {
 	}
 	const textCarts = JSON.stringify(carts);
 	fs.writeFileSync("./carts.txt", textCarts);
+});
+
+// Desafio mock
+
+import { Router } from "express";
+import faker from "faker";
+
+faker.locale = "es";
+
+export const fakeProductsRouter = Router();
+
+const generateFakeProducts = () => {
+	return {
+		name: faker.commerce.productName(),
+		price: faker.commerce.price(),
+		image: faker.image.image(),
+	};
+};
+
+const getFakeProducts = (quantity) => {
+	const products = [];
+	for (let i = 0; i < quantity; i++) {
+		products.push(generateFakeProducts());
+	}
+	return products;
+};
+
+// endpoint
+
+fakeProductsRouter.get("/", (res, res) => {
+	const products = getFakeProducts(5);
+	res.render("products.test", { products });
 });
 
 const server = httpServer.listen(PORT, () => {

@@ -1,19 +1,26 @@
 const socket = io.connect();
 
 const date = new Date();
-const clientEmail = document.querySelector("#email"); //accedo en el DOM al objeto input
+const clientEmail = document.querySelector("#userEmail"); //accedo en el DOM al objeto input
 const message = document.querySelector("#message"); //accedo en el DOM al objeto input
 const mailFormat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
 const sendClientMsg = () => {
 	if (clientEmail.value !== "" && clientEmail.value.match(mailFormat)) {
+		const messageSchema = {
+			author: {
+				id: email,
+				nombre: document.getElementById("userFirstName").value,
+				apellido: document.getElementById("userLastName").value,
+				edad: document.getElementById("userAge").value,
+				alias: document.getElementById("userAlias").value,
+				avatar: document.getElementById("userURL").value,
+			},
+			text: message,
+		};
 		/*Todo lo que se carga y capta el evento input, lo envío con un evento llamado "clientMsg" con
     el valor del input, input.value */
-		socket.emit("clientMsg", {
-			date: date,
-			clientEmail: clientEmail.value,
-			message: message.value,
-		});
+		socket.emit("clientMsg", messageSchema);
 
 		message.value = "";
 	} else {
