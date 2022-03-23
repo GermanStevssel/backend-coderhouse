@@ -23,4 +23,7 @@ const getFakeProducts = (quantity) => {
 
 // endpoint
 
-fakeProductsRouter.get("/api");
+fakeProductsRouter.get("/", (res, res) => {
+	const products = getFakeProducts(5);
+	res.render("products.test", { products });
+});
